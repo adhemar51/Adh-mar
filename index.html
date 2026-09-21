@@ -1,0 +1,3543 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JDA Rock Manager</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --bg: #08090c;
+    --sidebar: #0d0e12;
+    --panel: #12141a;
+    --panel2: #181a21;
+    --panel3: #1d2028;
+    --border: #292c35;
+
+    --text: #f4f5f7;
+    --muted: #858a98;
+    --muted2: #5e6370;
+
+    --red: #ff3154;
+    --red-dark: #b71935;
+    --green: #2bd486;
+    --blue: #42bdf5;
+    --purple: #9865ff;
+    --yellow: #f7c955;
+    --orange: #ff8b3d;
+
+    --radius: 14px;
+    --sidebar-width: 250px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background:
+        radial-gradient(
+            circle at 85% 0%,
+            rgba(255,49,84,.12),
+            transparent 28%
+        ),
+        var(--bg);
+    color: var(--text);
+    font-family: Inter, Arial, sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: .5;
+}
+
+::selection {
+    background: var(--red);
+    color: white;
+}
+
+/* =========================
+   LAYOUT
+========================= */
+
+.app {
+    min-height: 100vh;
+}
+
+.sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: var(--sidebar-width);
+    padding: 22px 14px;
+    background: rgba(13,14,18,.97);
+    border-right: 1px solid var(--border);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+}
+
+.main {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+}
+
+/* =========================
+   LOGO
+========================= */
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 4px 10px 28px;
+}
+
+.logo-mark {
+    width: 43px;
+    height: 43px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(
+        135deg,
+        var(--red),
+        var(--red-dark)
+    );
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 28px;
+    box-shadow: 0 10px 30px rgba(255,49,84,.22);
+}
+
+.logo-title {
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 25px;
+    letter-spacing: 1px;
+    line-height: 1;
+}
+
+.logo-title span {
+    color: var(--red);
+}
+
+.logo small {
+    display: block;
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 9px;
+    letter-spacing: 2px;
+    font-weight: 700;
+}
+
+/* =========================
+   NAVIGATION
+========================= */
+
+.nav-title {
+    color: #505562;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    padding: 5px 13px 9px;
+}
+
+.nav {
+    display: grid;
+    gap: 4px;
+}
+
+.nav button {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: #898e9a;
+    padding: 12px 13px;
+    border-radius: 10px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    transition: .2s ease;
+}
+
+.nav button:hover {
+    background: #17191f;
+    color: white;
+}
+
+.nav button.active {
+    color: white;
+    background:
+        linear-gradient(
+            90deg,
+            rgba(255,49,84,.18),
+            rgba(255,49,84,.04)
+        );
+    border-left: 3px solid var(--red);
+    padding-left: 10px;
+}
+
+.nav-icon {
+    width: 20px;
+    text-align: center;
+    font-size: 16px;
+}
+
+/* =========================
+   SIDEBAR BOTTOM
+========================= */
+
+.sidebar-bottom {
+    margin-top: auto;
+    border-top: 1px solid var(--border);
+    padding: 15px 10px 4px;
+}
+
+.online {
+    width: 7px;
+    height: 7px;
+    display: inline-block;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    margin-right: 6px;
+}
+
+.status {
+    color: #a0a5b0;
+    font-size: 10px;
+}
+
+.version {
+    margin-top: 8px;
+    color: #555a66;
+    font-size: 9px;
+}
+
+/* =========================
+   TOPBAR
+========================= */
+
+.topbar {
+    height: 74px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 32px;
+    background: rgba(8,9,12,.84);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(14px);
+}
+
+.top-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.topbar h2 {
+    margin: 0;
+    font-size: 15px;
+}
+
+.topbar-subtitle {
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.top-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.icon-btn,
+.avatar {
+    width: 39px;
+    height: 39px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: white;
+}
+
+.avatar {
+    border: 0;
+    background: var(--red);
+    font-weight: 800;
+    font-size: 11px;
+}
+
+.mobile-menu {
+    display: none;
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.content {
+    padding: 32px;
+}
+
+.page {
+    display: none;
+    animation: pageIn .22s ease;
+}
+
+.page.active {
+    display: block;
+}
+
+@keyframes pageIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.eyebrow {
+    margin: 0 0 5px;
+    color: var(--red);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 3px;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 47px;
+    line-height: .95;
+    letter-spacing: 1px;
+}
+
+.page-header p:last-child {
+    margin: 7px 0 0;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero {
+    min-height: 235px;
+    padding: 36px;
+    border-radius: 20px;
+    border: 1px solid #35212a;
+    background:
+        radial-gradient(
+            circle at 80% 20%,
+            rgba(255,49,84,.24),
+            transparent 35%
+        ),
+        linear-gradient(
+            135deg,
+            #181116,
+            #101116
+        );
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.hero::after {
+    content: "";
+    position: absolute;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,49,84,.08);
+    right: 90px;
+    top: -130px;
+}
+
+.hero h1 {
+    margin: 0;
+    font-family: "Bebas Neue", sans-serif;
+    font-size: 76px;
+    letter-spacing: 2px;
+    line-height: .85;
+}
+
+.hero h1 span {
+    color: var(--red);
+}
+
+.hero-text {
+    max-width: 610px;
+}
+
+.hero-text > p:last-child {
+    color: #a2a6b1;
+    font-size: 12px;
+    line-height: 1.7;
+    max-width: 570px;
+}
+
+.hero-guitar {
+    position: relative;
+    z-index: 2;
+    font-size: 115px;
+    transform: rotate(-14deg);
+    filter: drop-shadow(0 20px 30px rgba(0,0,0,.55));
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn {
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: white;
+    border-radius: 9px;
+    padding: 10px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    transition: .2s;
+}
+
+.btn:hover {
+    background: var(--panel2);
+    border-color: #3a3e48;
+}
+
+.btn.primary {
+    background: linear-gradient(
+        135deg,
+        var(--red),
+        #d91f43
+    );
+    border-color: transparent;
+    box-shadow: 0 8px 25px rgba(255,49,84,.13);
+}
+
+.btn.primary:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+.btn.danger:hover {
+    color: #ff6178;
+    border-color: rgba(255,49,84,.35);
+}
+
+.btn.small {
+    padding: 7px 10px;
+    font-size: 10px;
+}
+
+/* =========================
+   DASHBOARD STATS
+========================= */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin: 16px 0;
+}
+
+.stat-card {
+    min-height: 112px;
+    padding: 18px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--panel);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.stat-icon {
+    width: 43px;
+    height: 43px;
+    flex: 0 0 43px;
+    display: grid;
+    place-items: center;
+    border-radius: 11px;
+    font-size: 19px;
+}
+
+.stat-card.red .stat-icon {
+    background: rgba(255,49,84,.12);
+    color: var(--red);
+}
+
+.stat-card.blue .stat-icon {
+    background: rgba(66,189,245,.12);
+    color: var(--blue);
+}
+
+.stat-card.purple .stat-icon {
+    background: rgba(152,101,255,.12);
+    color: var(--purple);
+}
+
+.stat-card.green .stat-icon {
+    background: rgba(43,212,134,.12);
+    color: var(--green);
+}
+
+.stat-card small {
+    display: block;
+    color: var(--muted2);
+    font-size: 8px;
+    letter-spacing: 1px;
+    font-weight: 800;
+}
+
+.stat-card strong {
+    display: block;
+    margin-top: 5px;
+    font-size: 18px;
+}
+
+/* =========================
+   PANELS
+========================= */
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 16px;
+}
+
+.panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 19px 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.panel-header h3 {
+    margin: 0;
+    font-size: 13px;
+}
+
+.panel-header p {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+/* =========================
+   EVENT / TASK LIST
+========================= */
+
+.list {
+    display: grid;
+    gap: 9px;
+}
+
+.panel .list {
+    padding: 14px 18px 18px;
+}
+
+.list-item {
+    padding: 13px;
+    border: 1px solid var(--border);
+    background: #101217;
+    border-radius: 10px;
+}
+
+.list-item strong {
+    display: block;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.list-item small {
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.5;
+}
+.event-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.event-date {
+    width: 43px;
+    height: 43px;
+    flex: 0 0 43px;
+    border-radius: 9px;
+    border: 1px solid #45232d;
+    background: #21151a;
+    display: grid;
+    place-items: center;
+    text-align: center;
+}
+
+.event-date b {
+    color: var(--red);
+    font-size: 14px;
+}
+
+.event-info {
+    min-width: 0;
+}
+
+.event-info strong {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* =========================
+   TABLES
+========================= */
+
+.table-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.table-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 18px;
+    border-bottom: 1px solid var(--border);
+}
+
+.search {
+    width: 250px;
+    max-width: 100%;
+    padding: 9px 11px;
+    border: 1px solid var(--border);
+    background: #0c0e12;
+    color: white;
+    border-radius: 8px;
+    outline: none;
+    font-size: 11px;
+}
+
+.search:focus {
+    border-color: var(--red);
+}
+
+.table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 650px;
+}
+
+th,
+td {
+    text-align: left;
+    padding: 13px 15px;
+    border-bottom: 1px solid #22252c;
+}
+
+th {
+    color: #666b77;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+td {
+    font-size: 11px;
+    color: #d7d9de;
+}
+
+td strong {
+    color: white;
+}
+
+tr:last-child td {
+    border-bottom: 0;
+}
+
+.empty {
+    padding: 35px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.actions-cell {
+    display: flex;
+    gap: 5px;
+}
+
+/* =========================
+   BADGES
+========================= */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: #282b33;
+    color: #b9bdc7;
+    font-size: 8px;
+    font-weight: 800;
+}
+
+.badge.red {
+    background: #45171e;
+    color: #ff788a;
+}
+
+.badge.green {
+    background: #12372c;
+    color: #63dfad;
+}
+
+.badge.yellow {
+    background: #3d3215;
+    color: #f6d36a;
+}
+
+.badge.blue {
+    background: #123143;
+    color: #67cdf7;
+}
+
+.badge.purple {
+    background: #2c1d4c;
+    color: #b18bff;
+}
+
+/* =========================
+   CARDS
+========================= */
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.profile-card {
+    position: relative;
+    padding: 20px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.profile-avatar {
+    width: 51px;
+    height: 51px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(
+        135deg,
+        var(--red),
+        #72172b
+    );
+    font-family: "Bebas Neue";
+    font-size: 22px;
+    margin-bottom: 14px;
+}
+
+.profile-card h3 {
+    margin: 0;
+    font-size: 14px;
+}
+
+.profile-card p {
+    margin: 5px 0 0;
+    color: var(--muted);
+    font-size: 10px;
+}
+
+.profile-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 6px;
+}
+
+/* =========================
+   FINANCES
+========================= */
+
+.finance-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 15px;
+}
+
+.money-card {
+    padding: 21px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.money-card small {
+    color: var(--muted);
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    font-weight: 800;
+}
+
+.money-card strong {
+    display: block;
+    margin-top: 8px;
+    font-size: 26px;
+}
+
+.money-card.income strong {
+    color: var(--green);
+}
+
+.money-card.expense strong {
+    color: var(--red);
+}
+
+/* =========================
+   SETLIST
+========================= */
+
+.setlist-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+}
+
+.setlist-card {
+    padding: 20px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+.setlist-card h3 {
+    margin: 0;
+    font-family: "Bebas Neue";
+    font-size: 26px;
+    letter-spacing: .5px;
+}
+
+.setlist-card p {
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.song-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin: 13px 0;
+}
+
+.song-chip {
+    padding: 5px 7px;
+    border-radius: 6px;
+    background: #20232a;
+    color: #bfc3cb;
+    font-size: 9px;
+}
+
+/* =========================
+   TASKS
+========================= */
+
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.task-check {
+    width: 19px;
+    height: 19px;
+    flex: 0 0 19px;
+    accent-color: var(--green);
+}
+
+.task-content {
+    flex: 1;
+}
+
+.task-content strong {
+    margin: 0;
+}
+
+.task-done strong {
+    color: #626773;
+    text-decoration: line-through;
+}
+
+.task-done {
+    opacity: .65;
+}
+
+/* =========================
+   SETTINGS
+========================= */
+
+.settings-grid {
+    max-width: 760px;
+}
+
+/* =========================
+   FORMS
+========================= */
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 13px;
+}
+
+.field {
+    display: grid;
+    gap: 6px;
+}
+
+.field.full {
+    grid-column: 1 / -1;
+}
+
+.field label {
+    color: #a4a9b4;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.field input,
+.field select,
+.field textarea {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #0b0d11;
+    color: white;
+    outline: none;
+    font-size: 11px;
+}
+
+.field textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+    border-color: var(--red);
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    padding: 20px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,.76);
+    backdrop-filter: blur(8px);
+}
+
+.modal.open {
+    display: flex;
+}
+
+.modal-box {
+    width: min(650px, 100%);
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 24px;
+    background: #15171d;
+    border: 1px solid #343741;
+    border-radius: 17px;
+    box-shadow: 0 30px 100px rgba(0,0,0,.65);
+}
+
+.modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-head h2 {
+    margin: 0;
+    font-family: "Bebas Neue";
+    font-size: 30px;
+}
+
+.close {
+    width: 34px;
+    height: 34px;
+    border: 0;
+    background: transparent;
+    color: #858a95;
+    font-size: 25px;
+    border-radius: 8px;
+}
+
+.close:hover {
+    background: #202229;
+    color: white;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+/* =========================
+   TOAST
+========================= */
+
+.toast {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    z-index: 2000;
+    max-width: 330px;
+    padding: 12px 16px;
+    border-radius: 9px;
+    background: #1a1c22;
+    border: 1px solid #353842;
+    color: white;
+    font-size: 11px;
+    box-shadow: 0 15px 45px rgba(0,0,0,.45);
+    transform: translateY(80px);
+    opacity: 0;
+    pointer-events: none;
+    transition: .3s;
+}
+
+.toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width: 1100px) {
+
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .grid-2 {
+        grid-template-columns: 1fr;
+    }
+
+    .cards-grid,
+    .setlist-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width: 760px) {
+
+    :root {
+        --sidebar-width: 0px;
+    }
+
+    .sidebar {
+        width: 250px;
+        transform: translateX(-100%);
+        transition: .25s ease;
+        box-shadow: 20px 0 50px rgba(0,0,0,.4);
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .main {
+        margin-left: 0;
+    }
+
+    .mobile-menu {
+        display: block;
+    }
+
+    .topbar {
+        height: 68px;
+        padding: 0 16px;
+    }
+
+    .content {
+        padding: 20px 15px;
+    }
+
+    .hero {
+        min-height: 205px;
+        padding: 25px;
+    }
+
+    .hero h1 {
+        font-size: 55px;
+    }
+
+    .hero-guitar {
+        font-size: 70px;
+    }
+
+    .page-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .page-header h1 {
+        font-size: 42px;
+    }
+
+    .stats {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .cards-grid,
+    .setlist-grid,
+    .finance-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .field.full {
+        grid-column: auto;
+    }
+
+    .table-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .search {
+        width: 100%;
+    }
+}
+
+@media(max-width: 480px) {
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-guitar {
+        display: none;
+    }
+
+    .hero h1 {
+        font-size: 50px;
+    }
+}
+
+/* =========================
+   COMPLÉMENTS
+========================= */
+
+.row-past {
+    opacity: .5;
+}
+
+td a {
+    color: var(--blue);
+    text-decoration: none;
+}
+
+td a:hover {
+    text-decoration: underline;
+}
+
+.event-row .badge {
+    margin-left: auto;
+}
+
+.event-date div {
+    text-align: center;
+    line-height: 1.1;
+}
+
+.event-date span {
+    display: block;
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.task-item .actions-cell {
+    margin-left: auto;
+}
+
+.confirm-text {
+    margin: 0;
+    color: #c3c7d0;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.btn.solid-danger {
+    background: linear-gradient(135deg, #e0243f, var(--red-dark));
+    border-color: transparent;
+}
+
+.btn.solid-danger:hover {
+    filter: brightness(1.1);
+}
+
+.field.invalid input,
+.field.invalid select,
+.field.invalid textarea {
+    border-color: var(--red);
+}
+
+.picker {
+    display: grid;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #0b0d11;
+}
+
+#pickerList {
+    display: grid;
+    gap: 6px;
+}
+
+.picker-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 9px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--panel);
+    font-size: 11px;
+}
+
+.picker-num {
+    width: 18px;
+    color: var(--red);
+    font-weight: 800;
+}
+
+.picker-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.picker-name span {
+    color: var(--muted);
+}
+
+.picker-btns,
+.picker-add {
+    display: flex;
+    gap: 6px;
+}
+
+.picker-add select {
+    flex: 1;
+    min-width: 0;
+}
+
+.panel-body {
+    padding: 20px;
+}
+
+.settings-grid .panel {
+    margin-bottom: 16px;
+}
+
+.tool-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.tool-row:first-child {
+    padding-top: 0;
+}
+
+.tool-row:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.tool-row strong {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 12px;
+}
+
+.tool-row small {
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.tool-row .btn {
+    flex: 0 0 auto;
+}
+
+.overdue {
+    color: #ff788a;
+}
+
+@media(max-width: 760px) {
+
+    .tool-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .task-item {
+        flex-wrap: wrap;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- =========================
+     SIDEBAR
+========================= -->
+
+<aside class="sidebar" id="sidebar">
+
+    <div class="logo">
+
+        <div class="logo-mark" id="logoMark">J</div>
+
+        <div>
+            <div class="logo-title" id="logoTitle">
+                JDA <span>ROCK</span>
+            </div>
+            <small>BAND MANAGER</small>
+        </div>
+
+    </div>
+
+    <div class="nav-title">GESTION DU GROUPE</div>
+
+    <nav class="nav">
+
+        <button class="active" data-page="dashboard">
+            <span class="nav-icon">⌂</span>
+            Tableau de bord
+        </button>
+
+        <button data-page="members">
+            <span class="nav-icon">♟</span>
+            Membres
+        </button>
+
+        <button data-page="events">
+            <span class="nav-icon">★</span>
+            Agenda
+        </button>
+
+        <button data-page="rehearsals">
+            <span class="nav-icon">♫</span>
+            Répétitions
+        </button>
+
+        <button data-page="songs">
+            <span class="nav-icon">♪</span>
+            Morceaux
+        </button>
+
+        <button data-page="setlists">
+            <span class="nav-icon">☷</span>
+            Setlists
+        </button>
+
+        <button data-page="tasks">
+            <span class="nav-icon">✓</span>
+            Tâches
+        </button>
+
+        <button data-page="finances">
+            <span class="nav-icon">€</span>
+            Finances
+        </button>
+
+        <button data-page="gear">
+            <span class="nav-icon">⚡</span>
+            Matériel
+        </button>
+
+        <button data-page="contacts">
+            <span class="nav-icon">☎</span>
+            Contacts
+        </button>
+
+        <button data-page="settings">
+            <span class="nav-icon">⚙</span>
+            Paramètres
+        </button>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+
+        <div class="status">
+            <span class="online"></span>
+            <span id="statusText">JDA Rock est actif</span>
+        </div>
+
+        <div class="version">
+            JDA Manager v2.0
+        </div>
+
+    </div>
+
+</aside>
+
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<main class="main">
+
+<header class="topbar">
+
+    <div class="top-left">
+
+        <button
+            class="icon-btn mobile-menu"
+            id="mobileMenu">
+            ☰
+        </button>
+
+        <div>
+
+            <h2 id="pageTitle">
+                Tableau de bord
+            </h2>
+
+            <div class="topbar-subtitle" id="topSubtitle">
+                Gestion de JDA Rock
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="top-actions">
+
+        <button
+            class="icon-btn"
+            id="saveButton"
+            title="Sauvegarder">
+            💾
+        </button>
+
+        <button
+            class="avatar"
+            id="avatarBtn"
+            title="JDA Rock">
+            JR
+        </button>
+
+    </div>
+
+</header>
+
+
+<div class="content">
+
+
+<!-- =========================
+     DASHBOARD
+========================= -->
+
+<section
+    id="dashboard"
+    class="page active">
+
+    <div class="hero">
+
+        <div class="hero-text">
+
+            <p class="eyebrow">
+                BIENVENUE CHEZ
+            </p>
+
+            <h1 id="heroTitle">
+                JDA <span>ROCK</span>
+            </h1>
+
+            <p>
+                Organisez votre groupe, vos concerts,
+                votre répertoire, vos répétitions,
+                votre matériel et vos finances
+                depuis un seul espace.
+            </p>
+
+        </div>
+
+        <div class="hero-guitar">
+            🎸
+        </div>
+
+    </div>
+
+
+    <div class="stats">
+
+        <div class="stat-card red">
+
+            <div class="stat-icon">♟</div>
+
+            <div>
+                <small>MEMBRES</small>
+                <strong id="statMembers">0</strong>
+            </div>
+
+        </div>
+
+
+        <div class="stat-card blue">
+
+            <div class="stat-icon">★</div>
+
+            <div>
+                <small>ÉVÉNEMENTS</small>
+                <strong id="statEvents">0</strong>
+            </div>
+
+        </div>
+
+
+        <div class="stat-card purple">
+
+            <div class="stat-icon">♪</div>
+
+            <div>
+                <small>MORCEAUX</small>
+                <strong id="statSongs">0</strong>
+            </div>
+
+        </div>
+
+
+        <div class="stat-card green">
+
+            <div class="stat-icon">€</div>
+
+            <div>
+                <small>SOLDE</small>
+                <strong id="statBalance">0 €</strong>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="grid-2">
+
+        <div class="panel">
+
+            <div class="panel-header">
+
+                <div>
+                    <h3>📅 Prochains événements</h3>
+                    <p>Votre planning à venir</p>
+                </div>
+
+                <button
+                    class="btn small"
+                    data-go="events">
+                    Voir tout
+                </button>
+
+            </div>
+
+            <div
+                id="dashboardEvents"
+                class="list">
+            </div>
+
+        </div>
+
+
+        <div class="panel">
+
+            <div class="panel-header">
+
+                <div>
+                    <h3>✅ Tâches en cours</h3>
+                    <p>Ce qu'il reste à faire</p>
+                </div>
+
+                <button
+                    class="btn small"
+                    data-go="tasks">
+                    Voir tout
+                </button>
+
+            </div>
+
+            <div
+                id="dashboardTasks"
+                class="list">
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     MEMBERS
+========================= -->
+
+<section
+    id="members"
+    class="page">
+
+    <div class="page-header">
+
+        <div>
+            <p class="eyebrow">LE GROUPE</p>
+            <h1>Membres</h1>
+            <p>Les musiciens de JDA Rock.</p>
+        </div>
+
+        <button
+            class="btn primary"
+            data-action="member">
+            ＋ Ajouter un membre
+        </button>
+
+    </div>
+
+
+    <div
+        id="membersList"
+        class="cards-grid">
+    </div>
+
+</section>
+
+
+<!-- =========================
+     EVENTS
+========================= -->
+
+<section
+    id="events"
+    class="page">
+
+    <div class="page-header">
+
+        <div>
+            <p class="eyebrow">AGENDA</p>
+            <h1>Événements</h1>
+            <p>Concerts, rendez-vous et dates importantes.</p>
+        </div>
+
+        <button
+            class="btn primary"
+            data-action="event">
+            ＋ Ajouter un événement
+        </button>
+
+    </div>
+
+
+    <div class="table-card">
+
+        <div class="table-toolbar">
+
+            <input
+                id="eventSearch"
+                class="search"
+                placeholder="Rechercher un événement...">
+
+        </div>
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>DATE</th>
+                        <th>ÉVÉNEMENT</th>
+                        <th>LIEU</th>
+                        <th>HEURE</th>
+                        <th>TYPE</th>
+                        <th>ACTIONS</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="eventsTable"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     REHEARSALS
+========================= -->
+
+<section
+    id="rehearsals"
+    class="page">
+
+    <div class="page-header">
+
+        <div>
+            <p class="eyebrow">PRÉPARATION</p>
+            <h1>Répétitions</h1>
+            <p>Planifiez vos séances de travail.</p>
+        </div>
+
+        <button
+            class="btn primary"
+            data-action="rehearsal">
+            ＋ Nouvelle répétition
+        </button>
+
+    </div>
+
+
+    <div class="table-card">
+
+        <div class="table-toolbar">
+
+            <input
+                id="rehearsalSearch"
+                class="search"
+                placeholder="Rechercher une répétition...">
+
+        </div>
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>DATE</th>
+                        <th>HEURE</th>
+                        <th>LIEU</th>
+                        <th>OBJECTIF</th>
+                        <th>ACTIONS</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="rehearsalsTable"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     SONGS
+========================= -->
+
+<section
+    id="songs"
+    class="page">
+
+    <div class="page-header">
+
+        <div>
+            <p class="eyebrow">RÉPERTOIRE</p>
+            <h1>Morceaux</h1>
+            <p>Votre bibliothèque musicale.</p>
+        </div>
+
+        <button
+            class="btn primary"
+            data-action="song">
+            ＋ Ajouter un morceau
+        </button>
+
+    </div>
+
+
+    <div class="table-card">
+
+        <div class="table-toolbar">
+
+            <input
+                id="songSearch"
+                class="search"
+                placeholder="Rechercher un morceau ou artiste...">
+
+        </div>
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>TITRE</th>
+                        <th>ARTISTE</th>
+                        <th>TONALITÉ</th>
+                        <th>DURÉE</th>
+                        <th>STATUT</th>
+                        <th>ACTIONS</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="songsTable"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     SETLISTS
+========================= -->
+
+<section
+    id="setlists"
+    class="page">
+
+    <div class="page-header">
+
+        <div>
+            <p class="eyebrow">LIVE</p>
+            <h1>Setlists</h1>
+            <p>Préparez vos concerts morceau par morceau.</p>
+        </div>
+
+        <button
+            class="btn primary"
+            data-action="setlist">
+            ＋ Nouvelle setlist
+        </button>
+
+    </div>
+
+
+    <div
+        id="setlistsList"
+        class="setlist-grid">
+    </div>
+
+</section>
+
+
+<!-- =========================
+     TASKS
+========================= -->
+
+<section
+    id="tasks"
+    class="page">
+
+    <div class="page-header">
+
+        <div>
+            <p class="eyebrow">ORGANISATION</p>
+            <h1>Tâches</h1>
+            <p>Tout ce que le groupe doit accomplir.</p>
+        </div>
+
+        <button
+            class="btn primary"
+            data-action="task">
+            ＋ Nouvelle tâche
+        </button>
+
+    </div>
+
+
+    <div class="panel">
+
+        <div
+            id="tasksList"
+            class="list"
+            style="padding:18px;">
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     FINANCES
+========================= -->
+
+<section
+    id="finances"
+    class="page">
+
+    <div class="page-header">
+
+        <div>
+            <p class="eyebrow">ARGENT</p>
+            <h1>Finances</h1>
+            <p>Suivez les revenus et dépenses du groupe.</p>
+        </div>
+
+        <button
+            class="btn primary"
+            data-action="finance">
+            ＋ Ajouter une opération
+        </button>
+
+    </div>
+
+
+    <div class="finance-grid">
+
+        <div class="money-card income">
+
+            <small>REVENUS</small>
+
+            <strong id="incomeTotal">
+                0 €
+            </strong>
+
+        </div>
+
+        <div class="money-card expense">
+
+            <small>DÉPENSES</small>
+
+            <strong id="expenseTotal">
+                0 €
+            </strong>
+
+        </div>
+
+        <div class="money-card">
+
+            <small>SOLDE</small>
+
+            <strong id="balanceTotal">
+                0 €
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <div class="table-card">
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>DATE</th>
+                        <th>DESCRIPTION</th>
+                        <th>TYPE</th>
+                        <th>MONTANT</th>
+                        <th>ACTIONS</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="financeTable"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     GEAR
+========================= -->
+
+<section
+    id="gear"
+    class="page">
+
+    <div class="page-header">
+
+        <div>
+            <p class="eyebrow">BACKLINE</p>
+            <h1>Matériel</h1>
+            <p>Instruments, amplis, câbles et équipements.</p>
+        </div>
+
+        <button
+            class="btn primary"
+            data-action="gear">
+            ＋ Ajouter du matériel
+        </button>
+
+    </div>
+
+
+    <div class="table-card">
+
+        <div class="table-toolbar">
+
+            <input
+                id="gearSearch"
+                class="search"
+                placeholder="Rechercher un équipement...">
+
+        </div>
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>ÉQUIPEMENT</th>
+                        <th>CATÉGORIE</th>
+                        <th>PROPRIÉTAIRE</th>
+                        <th>ÉTAT</th>
+                        <th>ACTIONS</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="gearTable"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     CONTACTS
+========================= -->
+
+<section
+    id="contacts"
+    class="page">
+
+    <div class="page-header">
+
+        <div>
+            <p class="eyebrow">RÉSEAU</p>
+            <h1>Contacts</h1>
+            <p>Salles, techniciens, programmateurs et partenaires.</p>
+        </div>
+
+        <button
+            class="btn primary"
+            data-action="contact">
+            ＋ Ajouter un contact
+        </button>
+
+    </div>
+
+
+    <div class="table-card">
+
+        <div class="table-toolbar">
+
+            <input
+                id="contactSearch"
+                class="search"
+                placeholder="Rechercher un contact...">
+
+        </div>
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>NOM</th>
+                        <th>RÔLE</th>
+                        <th>TÉLÉPHONE</th>
+                        <th>E-MAIL</th>
+                        <th>ACTIONS</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="contactsTable"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     SETTINGS
+========================= -->
+
+<section
+    id="settings"
+    class="page">
+
+    <div class="page-header">
+
+        <div>
+            <p class="eyebrow">CONFIGURATION</p>
+            <h1>Paramètres</h1>
+            <p>Personnalisez l'application et gérez vos données.</p>
+        </div>
+
+    </div>
+
+
+    <div class="settings-grid">
+
+        <div class="panel">
+
+            <div class="panel-header">
+                <div>
+                    <h3>🎸 Informations du groupe</h3>
+                    <p>Le nom du groupe apparaît dans le menu, l'accueil et le titre de la page.</p>
+                </div>
+            </div>
+
+            <div class="panel-body">
+
+                <div class="form-grid">
+
+                    <div class="field">
+                        <label for="setName">Nom du groupe</label>
+                        <input id="setName" maxlength="40">
+                    </div>
+
+                    <div class="field">
+                        <label for="setGenre">Style musical</label>
+                        <input id="setGenre" maxlength="40">
+                    </div>
+
+                    <div class="field">
+                        <label for="setCity">Ville</label>
+                        <input id="setCity" maxlength="60">
+                    </div>
+
+                    <div class="field">
+                        <label for="setEmail">E-mail de contact</label>
+                        <input id="setEmail" type="email" maxlength="80">
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn primary" id="saveSettings">
+                        Enregistrer
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="panel">
+
+            <div class="panel-header">
+                <div>
+                    <h3>💾 Données</h3>
+                    <p>Tout est enregistré automatiquement dans ce navigateur.</p>
+                </div>
+            </div>
+
+            <div class="panel-body">
+
+                <div class="tool-row">
+                    <div>
+                        <strong>Exporter les données</strong>
+                        <small>Télécharge une sauvegarde complète au format JSON.</small>
+                    </div>
+                    <button class="btn" data-tool="export">Exporter</button>
+                </div>
+
+                <div class="tool-row">
+                    <div>
+                        <strong>Importer une sauvegarde</strong>
+                        <small>Remplace les données actuelles par celles d'un fichier exporté.</small>
+                    </div>
+                    <button class="btn" data-tool="import">Importer</button>
+                </div>
+
+                <div class="tool-row">
+                    <div>
+                        <strong>Charger des données d'exemple</strong>
+                        <small>Remplace les données actuelles par un jeu de démonstration.</small>
+                    </div>
+                    <button class="btn" data-tool="demo">Charger</button>
+                </div>
+
+                <div class="tool-row">
+                    <div>
+                        <strong>Tout effacer</strong>
+                        <small>Supprime membres, événements, morceaux, finances et le reste. Les informations du groupe sont conservées.</small>
+                    </div>
+                    <button class="btn danger" data-tool="reset">Tout effacer</button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+</div>
+</main>
+</div>
+
+
+<!-- =========================
+     MODAL
+========================= -->
+
+<div class="modal" id="modal">
+
+    <div
+        class="modal-box"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle">
+
+        <div class="modal-head">
+
+            <h2 id="modalTitle"></h2>
+
+            <button
+                type="button"
+                class="close"
+                id="modalClose"
+                aria-label="Fermer">
+                ×
+            </button>
+
+        </div>
+
+        <form id="modalForm" novalidate>
+
+            <div id="modalBody"></div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn"
+                    id="modalCancel">
+                    Annuler
+                </button>
+
+                <button
+                    type="submit"
+                    class="btn primary"
+                    id="modalSubmit">
+                    Enregistrer
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<input
+    type="file"
+    id="importFile"
+    accept=".json,application/json"
+    hidden>
+
+
+<script>
+(function () {
+'use strict';
+
+/* =========================
+   UTILITAIRES
+========================= */
+
+const STORAGE_KEY = 'jdaRockManager.v2';
+const COLLECTIONS = [
+    'members', 'events', 'rehearsals', 'songs',
+    'setlists', 'tasks', 'finances', 'gear', 'contacts'
+];
+
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+}[c]));
+
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+
+function isoDate(d) {
+    return d.getFullYear() + '-' +
+        String(d.getMonth() + 1).padStart(2, '0') + '-' +
+        String(d.getDate()).padStart(2, '0');
+}
+
+const todayISO = () => isoDate(new Date());
+
+function inDays(n) {
+    const d = new Date();
+    d.setDate(d.getDate() + n);
+    return isoDate(d);
+}
+
+function parseISO(s) {
+    return new Date(s + 'T00:00:00');
+}
+
+function fmtDate(s) {
+    if (!s) return '—';
+    const d = parseISO(s);
+    return isNaN(d) ? String(s) : d.toLocaleDateString('fr-FR', {
+        day: '2-digit', month: 'short', year: 'numeric'
+    });
+}
+
+const fmtMoney = n => Number(n || 0).toLocaleString('fr-FR', {
+    style: 'currency', currency: 'EUR'
+});
+
+function normalizeDuration(str) {
+    str = String(str || '').trim();
+    if (!str) return '';
+    let m = /^(\d{1,3}):([0-5]\d)$/.exec(str);
+    if (m) return (+m[1]) + ':' + m[2];
+    m = /^(\d{1,3})$/.exec(str);
+    if (m) return (+m[1]) + ':00';
+    return null;
+}
+
+function parseDuration(str) {
+    const m = /^(\d+):([0-5]\d)$/.exec(String(str || '').trim());
+    return m ? (+m[1]) * 60 + (+m[2]) : 0;
+}
+
+function fmtTotal(sec) {
+    if (!sec) return '0 min';
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    if (h) return h + ' h ' + String(m).padStart(2, '0');
+    return m + ' min' + (s ? ' ' + String(s).padStart(2, '0') + ' s' : '');
+}
+
+const byDateTime = (a, b) =>
+    (a.date + ' ' + (a.time || '')).localeCompare(b.date + ' ' + (b.time || ''));
+
+function initials(name) {
+    const p = String(name || '').trim().split(/\s+/);
+    const a = Array.from(p[0] || '?')[0];
+    const b = p[1] ? Array.from(p[1])[0] : '';
+    return (a + b).toUpperCase();
+}
+
+function matches(query, ...fields) {
+    const q = String(query || '').trim().toLowerCase();
+    if (!q) return true;
+    return fields.some(f => String(f || '').toLowerCase().includes(q));
+}
+
+function monthShort(s) {
+    return parseISO(s).toLocaleDateString('fr-FR', { month: 'short' })
+        .replace('.', '').toUpperCase();
+}
+
+/* =========================
+   CONSTANTES MÉTIER
+========================= */
+
+const EVENT_TYPES = {
+    'Concert': 'red',
+    'Festival': 'purple',
+    'Studio': 'blue',
+    'Réunion': 'yellow',
+    'Autre': ''
+};
+
+const SONG_STATUS = {
+    'À apprendre': 'yellow',
+    'En travail': 'blue',
+    'Prêt': 'green'
+};
+
+const GEAR_CONDITIONS = {
+    'Excellent': 'green',
+    'Bon': 'blue',
+    'Usé': 'yellow',
+    'À réparer': 'red'
+};
+
+const GEAR_CATEGORIES = [
+    'Guitare', 'Basse', 'Batterie', 'Clavier', 'Ampli',
+    'Micro', 'Sono', 'Câbles', 'Éclairage', 'Transport', 'Autre'
+];
+
+const KEYS = [
+    'C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'
+];
+
+/* =========================
+   ÉTAT + STOCKAGE
+========================= */
+
+function emptyState() {
+    return {
+        settings: { bandName: 'JDA Rock', genre: 'Rock', city: '', email: '' },
+        members: [], events: [], rehearsals: [], songs: [],
+        setlists: [], tasks: [], finances: [], gear: [], contacts: []
+    };
+}
+
+function seedState() {
+    const s = emptyState();
+
+    s.members = [
+        { id: uid(), name: 'Alex',    role: 'Chant',    phone: '', email: '' },
+        { id: uid(), name: 'Sam',     role: 'Guitare',  phone: '', email: '' },
+        { id: uid(), name: 'Jordan',  role: 'Basse',    phone: '', email: '' },
+        { id: uid(), name: 'Camille', role: 'Batterie', phone: '', email: '' }
+    ];
+
+    const songData = [
+        ['Smoke on the Water',  'Deep Purple',       'G', '5:40', 'Prêt'],
+        ['Back in Black',       'AC/DC',             'E', '4:15', 'Prêt'],
+        ['Seven Nation Army',   'The White Stripes', 'E', '3:52', 'En travail'],
+        ['Highway to Hell',     'AC/DC',             'A', '3:28', 'À apprendre'],
+        ["Sweet Child O' Mine", "Guns N' Roses",     'D', '5:56', 'En travail']
+    ];
+    s.songs = songData.map(d => ({
+        id: uid(), title: d[0], artist: d[1], key: d[2], duration: d[3], status: d[4]
+    }));
+
+    const concertId = uid();
+    s.events = [
+        { id: concertId, title: 'Concert à la salle des fêtes', date: inDays(14), time: '21:00', place: 'Salle des fêtes', type: 'Concert' },
+        { id: uid(), title: 'Réunion de préparation', date: inDays(5), time: '19:00', place: 'Local de répétition', type: 'Réunion' },
+        { id: uid(), title: 'Session d’enregistrement', date: inDays(30), time: '14:00', place: 'Studio', type: 'Studio' }
+    ];
+
+    s.rehearsals = [
+        { id: uid(), date: inDays(3),  time: '18:30', place: 'Local de répétition', goal: 'Travailler les transitions de la setlist' },
+        { id: uid(), date: inDays(10), time: '18:30', place: 'Local de répétition', goal: 'Répétition générale avant le concert' }
+    ];
+
+    s.setlists = [
+        {
+            id: uid(),
+            name: 'Setlist concert',
+            eventId: concertId,
+            notes: 'Finir sur le morceau le plus énergique.',
+            songIds: [s.songs[1].id, s.songs[2].id, s.songs[0].id]
+        }
+    ];
+
+    s.tasks = [
+        { id: uid(), title: 'Imprimer les setlists',        assignee: 'Sam',     due: inDays(6), done: false },
+        { id: uid(), title: 'Réserver le local',            assignee: 'Camille', due: inDays(2), done: false },
+        { id: uid(), title: 'Créer l’affiche du concert', assignee: 'Alex',    due: inDays(9), done: false },
+        { id: uid(), title: 'Racheter des cordes',          assignee: 'Jordan',  due: inDays(-2), done: true }
+    ];
+
+    s.finances = [
+        { id: uid(), date: inDays(-20), desc: 'Cachet du dernier concert', type: 'Revenu',  amount: 150 },
+        { id: uid(), date: inDays(-12), desc: 'Cotisations du mois',       type: 'Revenu',  amount: 80 },
+        { id: uid(), date: inDays(-8),  desc: 'Location du local',         type: 'Dépense', amount: 40 },
+        { id: uid(), date: inDays(-2),  desc: 'Cordes et médiators',       type: 'Dépense', amount: 25.6 }
+    ];
+
+    s.gear = [
+        { id: uid(), name: 'Ampli guitare 50 W',    category: 'Ampli',    owner: 'Sam',     condition: 'Bon' },
+        { id: uid(), name: 'Batterie complète',     category: 'Batterie', owner: 'Camille', condition: 'Excellent' },
+        { id: uid(), name: 'Micro chant dynamique', category: 'Micro',    owner: 'Alex',    condition: 'Bon' },
+        { id: uid(), name: 'Câbles jack (x6)',      category: 'Câbles',   owner: 'Groupe',  condition: 'Usé' }
+    ];
+
+    s.contacts = [
+        { id: uid(), name: 'Salle des fêtes',   role: 'Salle',           phone: '06 00 00 00 01', email: '' },
+        { id: uid(), name: 'Marc',              role: 'Ingénieur du son', phone: '06 00 00 00 02', email: '' }
+    ];
+
+    return s;
+}
+
+function normalizeState(p) {
+    const base = emptyState();
+    const out = Object.assign({}, base, p);
+    out.settings = Object.assign({}, base.settings, (p && p.settings) || {});
+    COLLECTIONS.forEach(k => { if (!Array.isArray(out[k])) out[k] = []; });
+    out.setlists.forEach(sl => {
+        if (!Array.isArray(sl.songIds)) sl.songIds = [];
+    });
+    return out;
+}
+
+function loadState() {
+    try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return normalizeState(JSON.parse(raw));
+    } catch (e) {
+        console.warn('Lecture du stockage impossible :', e);
+    }
+    return seedState();
+}
+
+let state = loadState();
+
+function persist() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
+function commit() {
+    persist();
+    renderAll();
+}
+
+/* =========================
+   TOAST
+========================= */
+
+let toastTimer = null;
+
+function toast(msg) {
+    const t = $('#toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+/* =========================
+   MODAL
+========================= */
+
+let currentSubmit = null;
+
+function openModal(opts) {
+    $('#modalTitle').textContent = opts.title;
+    $('#modalBody').innerHTML = opts.html;
+
+    const sub = $('#modalSubmit');
+    sub.textContent = opts.submitLabel || 'Enregistrer';
+    sub.className = 'btn ' + (opts.danger ? 'solid-danger' : 'primary');
+
+    currentSubmit = opts.onSubmit || null;
+    $('#modal').classList.add('open');
+
+    setTimeout(() => {
+        const first = $('#modalBody input, #modalBody select, #modalBody textarea');
+        (first || sub).focus();
+    }, 30);
+}
+
+function closeModal() {
+    $('#modal').classList.remove('open');
+    $('#modalBody').innerHTML = '';
+    currentSubmit = null;
+}
+
+$('#modalForm').addEventListener('submit', e => {
+    e.preventDefault();
+    if (!currentSubmit) return closeModal();
+    const result = currentSubmit(e.target);
+    if (result !== false) closeModal();
+});
+
+$('#modalClose').addEventListener('click', closeModal);
+$('#modalCancel').addEventListener('click', closeModal);
+
+$('#modal').addEventListener('mousedown', e => {
+    if (e.target.id === 'modal') closeModal();
+});
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+});
+
+function confirmDialog(title, messageHTML, okLabel, onOk, danger) {
+    openModal({
+        title: title,
+        html: '<p class="confirm-text">' + messageHTML + '</p>',
+        submitLabel: okLabel,
+        danger: danger !== false,
+        onSubmit: () => { onOk(); }
+    });
+}
+
+/* =========================
+   FORMULAIRES GÉNÉRIQUES
+========================= */
+
+const getSong = id => state.songs.find(s => s.id === id);
+
+const SCHEMAS = {
+    member: {
+        coll: 'members',
+        add: 'Ajouter un membre',
+        edit: 'Modifier le membre',
+        name: i => i.name,
+        fields: [
+            { k: 'name',  label: 'Nom', required: true },
+            { k: 'role',  label: 'Rôle / instrument', placeholder: 'Chant, guitare…' },
+            { k: 'phone', label: 'Téléphone', type: 'tel' },
+            { k: 'email', label: 'E-mail', type: 'email' }
+        ]
+    },
+
+    event: {
+        coll: 'events',
+        add: 'Ajouter un événement',
+        edit: 'Modifier l’événement',
+        name: i => i.title,
+        defaults: () => ({ date: todayISO(), time: '20:00', type: 'Concert' }),
+        fields: [
+            { k: 'title', label: 'Titre', required: true, full: true },
+            { k: 'date',  label: 'Date', type: 'date', required: true },
+            { k: 'time',  label: 'Heure', type: 'time' },
+            { k: 'place', label: 'Lieu', full: true },
+            { k: 'type',  label: 'Type', type: 'select', options: Object.keys(EVENT_TYPES), full: true }
+        ]
+    },
+
+    rehearsal: {
+        coll: 'rehearsals',
+        add: 'Nouvelle répétition',
+        edit: 'Modifier la répétition',
+        name: i => 'Répétition du ' + fmtDate(i.date),
+        defaults: () => ({ date: todayISO(), time: '18:30' }),
+        fields: [
+            { k: 'date',  label: 'Date', type: 'date', required: true },
+            { k: 'time',  label: 'Heure', type: 'time' },
+            { k: 'place', label: 'Lieu', full: true },
+            { k: 'goal',  label: 'Objectif de la séance', type: 'textarea', full: true }
+        ]
+    },
+
+    song: {
+        coll: 'songs',
+        add: 'Ajouter un morceau',
+        edit: 'Modifier le morceau',
+        name: i => i.title,
+        defaults: () => ({ status: 'À apprendre' }),
+        fields: [
+            { k: 'title',    label: 'Titre', required: true },
+            { k: 'artist',   label: 'Artiste' },
+            { k: 'key',      label: 'Tonalité', type: 'select', options: [''].concat(KEYS) },
+            { k: 'duration', label: 'Durée (m:ss)', placeholder: '3:45' },
+            { k: 'status',   label: 'Statut', type: 'select', options: Object.keys(SONG_STATUS), full: true }
+        ],
+        check: v => {
+            const d = normalizeDuration(v.duration);
+            if (d === null) return 'Durée invalide : utilisez le format m:ss, par exemple 3:45';
+            v.duration = d;
+            return null;
+        }
+    },
+
+    setlist: {
+        coll: 'setlists',
+        add: 'Nouvelle setlist',
+        edit: 'Modifier la setlist',
+        name: i => i.name,
+        defaults: () => ({ songIds: [], eventId: '' }),
+        fields: [
+            { k: 'name', label: 'Nom de la setlist', required: true, full: true },
+            {
+                k: 'eventId', label: 'Événement associé', type: 'select', full: true,
+                options: () => [{ value: '', label: '— Aucun —' }].concat(
+                    state.events.slice().sort(byDateTime).map(e => ({
+                        value: e.id, label: fmtDate(e.date) + ' · ' + e.title
+                    }))
+                )
+            },
+            { k: 'songIds', label: 'Morceaux (dans l’ordre du concert)', type: 'songs', full: true },
+            { k: 'notes', label: 'Notes', type: 'textarea', full: true }
+        ]
+    },
+
+    task: {
+        coll: 'tasks',
+        add: 'Nouvelle tâche',
+        edit: 'Modifier la tâche',
+        name: i => i.title,
+        defaults: () => ({ done: false }),
+        fields: [
+            { k: 'title',    label: 'Tâche', required: true, full: true },
+            { k: 'assignee', label: 'Responsable' },
+            { k: 'due',      label: 'Échéance', type: 'date' }
+        ]
+    },
+
+    finance: {
+        coll: 'finances',
+        add: 'Ajouter une opération',
+        edit: 'Modifier l’opération',
+        name: i => i.desc,
+        defaults: () => ({ date: todayISO(), type: 'Dépense' }),
+        fields: [
+            { k: 'desc',   label: 'Description', required: true, full: true },
+            { k: 'date',   label: 'Date', type: 'date', required: true },
+            { k: 'type',   label: 'Type', type: 'select', options: ['Revenu', 'Dépense'] },
+            { k: 'amount', label: 'Montant (€)', type: 'number', required: true, attrs: 'step="0.01" min="0"', full: true }
+        ],
+        check: v => {
+            const n = Number(v.amount);
+            if (!isFinite(n) || n <= 0) return 'Le montant doit être supérieur à 0';
+            v.amount = Math.round(n * 100) / 100;
+            return null;
+        }
+    },
+
+    gear: {
+        coll: 'gear',
+        add: 'Ajouter du matériel',
+        edit: 'Modifier le matériel',
+        name: i => i.name,
+        defaults: () => ({ category: 'Guitare', condition: 'Bon', owner: 'Groupe' }),
+        fields: [
+            { k: 'name',      label: 'Équipement', required: true, full: true },
+            { k: 'category',  label: 'Catégorie', type: 'select', options: GEAR_CATEGORIES },
+            { k: 'condition', label: 'État', type: 'select', options: Object.keys(GEAR_CONDITIONS) },
+            { k: 'owner',     label: 'Propriétaire', placeholder: 'Groupe ou nom du membre', full: true }
+        ]
+    },
+
+    contact: {
+        coll: 'contacts',
+        add: 'Ajouter un contact',
+        edit: 'Modifier le contact',
+        name: i => i.name,
+        fields: [
+            { k: 'name',  label: 'Nom', required: true },
+            { k: 'role',  label: 'Rôle', placeholder: 'Salle, ingé son, programmateur…' },
+            { k: 'phone', label: 'Téléphone', type: 'tel' },
+            { k: 'email', label: 'E-mail', type: 'email' }
+        ]
+    }
+};
+
+function fieldHTML(f, val) {
+    const id = 'f_' + f.k;
+    const v = val == null ? '' : val;
+    let input;
+
+    if (f.type === 'select') {
+        const opts = typeof f.options === 'function' ? f.options() : f.options;
+        input = '<select id="' + id + '" name="' + f.k + '">' + opts.map(o => {
+            const ov = typeof o === 'object' ? o.value : o;
+            const ol = typeof o === 'object' ? o.label : (o === '' ? '—' : o);
+            return '<option value="' + esc(ov) + '"' +
+                (String(v) === String(ov) ? ' selected' : '') + '>' + esc(ol) + '</option>';
+        }).join('') + '</select>';
+    } else if (f.type === 'textarea') {
+        input = '<textarea id="' + id + '" name="' + f.k + '">' + esc(v) + '</textarea>';
+    } else if (f.type === 'songs') {
+        input = songPickerHTML();
+    } else {
+        input = '<input id="' + id + '" name="' + f.k + '" type="' + (f.type || 'text') + '"' +
+            ' value="' + esc(v) + '"' +
+            (f.placeholder ? ' placeholder="' + esc(f.placeholder) + '"' : '') +
+            (f.attrs ? ' ' + f.attrs : '') + '>';
+    }
+
+    return '<div class="field' + (f.full ? ' full' : '') + '">' +
+        '<label for="' + id + '">' + esc(f.label) + (f.required ? ' *' : '') + '</label>' +
+        input + '</div>';
+}
+
+/* --- sélecteur de morceaux (setlist) --- */
+
+function songPickerHTML() {
+    return '<div class="picker">' +
+        '<div id="pickerList"></div>' +
+        '<div class="picker-add">' +
+        '<select id="pickerSelect"></select>' +
+        '<button type="button" class="btn small" id="pickerAdd">＋ Ajouter</button>' +
+        '</div></div>';
+}
+
+function initSongPicker(initial) {
+    const ids = (initial || []).filter(id => getSong(id));
+    const list = $('#pickerList');
+    const sel = $('#pickerSelect');
+    const addBtn = $('#pickerAdd');
+
+    function draw() {
+        list.innerHTML = ids.length ? ids.map((id, i) => {
+            const s = getSong(id);
+            return '<div class="picker-row">' +
+                '<span class="picker-num">' + (i + 1) + '</span>' +
+                '<span class="picker-name">' + esc(s.title) +
+                (s.artist ? ' <span>— ' + esc(s.artist) + '</span>' : '') + '</span>' +
+                '<span class="picker-btns">' +
+                '<button type="button" class="btn small" data-mv="-1" data-i="' + i + '"' + (i === 0 ? ' disabled' : '') + '>↑</button>' +
+                '<button type="button" class="btn small" data-mv="1" data-i="' + i + '"' + (i === ids.length - 1 ? ' disabled' : '') + '>↓</button>' +
+                '<button type="button" class="btn small danger" data-rm="' + i + '">✕</button>' +
+                '</span></div>';
+        }).join('') : '<div class="empty" style="padding:14px">Aucun morceau dans la setlist</div>';
+
+        const available = state.songs.filter(s => !ids.includes(s.id));
+        if (!state.songs.length) {
+            sel.innerHTML = '<option value="">Ajoutez d’abord des morceaux au répertoire</option>';
+        } else if (!available.length) {
+            sel.innerHTML = '<option value="">Tous les morceaux sont déjà ajoutés</option>';
+        } else {
+            sel.innerHTML = '<option value="">Choisir un morceau…</option>' + available.map(s =>
+                '<option value="' + esc(s.id) + '">' + esc(s.title) + (s.artist ? ' — ' + esc(s.artist) : '') + '</option>'
+            ).join('');
+        }
+        addBtn.disabled = !available.length;
+        sel.disabled = !available.length;
+    }
+
+    list.addEventListener('click', e => {
+        const b = e.target.closest('button');
+        if (!b || b.disabled) return;
+        if (b.dataset.mv) {
+            const i = +b.dataset.i;
+            const j = i + (+b.dataset.mv);
+            if (j >= 0 && j < ids.length) {
+                const tmp = ids[i]; ids[i] = ids[j]; ids[j] = tmp;
+                draw();
+            }
+        } else if (b.dataset.rm !== undefined) {
+            ids.splice(+b.dataset.rm, 1);
+            draw();
+        }
+    });
+
+    addBtn.addEventListener('click', () => {
+        if (sel.value) { ids.push(sel.value); draw(); }
+    });
+
+    draw();
+    return () => ids.slice();
+}
+
+function openForm(type, id) {
+    const S = SCHEMAS[type];
+    if (!S) return;
+
+    const item = id ? state[S.coll].find(x => x.id === id) : null;
+    if (id && !item) return;
+
+    const vals = item || Object.assign({}, S.defaults ? S.defaults() : {});
+    let getPicked = null;
+
+    openModal({
+        title: item ? S.edit : S.add,
+        submitLabel: item ? 'Enregistrer' : 'Ajouter',
+        html: '<div class="form-grid">' +
+            S.fields.map(f => fieldHTML(f, vals[f.k])).join('') + '</div>',
+
+        onSubmit(form) {
+            $$('.field.invalid', form).forEach(el => el.classList.remove('invalid'));
+            const values = {};
+
+            for (const f of S.fields) {
+                if (f.type === 'songs') {
+                    values[f.k] = getPicked ? getPicked() : [];
+                    continue;
+                }
+                const el = form.querySelector('[name="' + f.k + '"]');
+                const v = el.value.trim();
+                if (f.required && !v) {
+                    el.closest('.field').classList.add('invalid');
+                    el.focus();
+                    toast('Le champ « ' + f.label.replace(/ \(.*\)/, '') + ' » est obligatoire');
+                    return false;
+                }
+                values[f.k] = v;
+            }
+
+            const err = S.check ? S.check(values) : null;
+            if (err) { toast(err); return false; }
+
+            if (item) {
+                Object.assign(item, values);
+            } else {
+                state[S.coll].push(Object.assign({ id: uid() }, values));
+            }
+
+            commit();
+            toast(item ? 'Modifications enregistrées' : 'Ajouté avec succès');
+        }
+    });
+
+    const pickerField = S.fields.find(f => f.type === 'songs');
+    if (pickerField) getPicked = initSongPicker(vals[pickerField.k]);
+}
+
+function askDelete(type, id) {
+    const S = SCHEMAS[type];
+    if (!S) return;
+    const item = state[S.coll].find(x => x.id === id);
+    if (!item) return;
+
+    confirmDialog(
+        'Confirmer la suppression',
+        'Supprimer <strong>« ' + esc(S.name(item)) + ' »</strong> ? Cette action est définitive.',
+        'Supprimer',
+        () => {
+            state[S.coll] = state[S.coll].filter(x => x.id !== id);
+            if (type === 'song') {
+                state.setlists.forEach(sl => {
+                    sl.songIds = sl.songIds.filter(sid => sid !== id);
+                });
+            }
+            if (type === 'event') {
+                state.setlists.forEach(sl => {
+                    if (sl.eventId === id) sl.eventId = '';
+                });
+            }
+            commit();
+            toast('Supprimé');
+        }
+    );
+}
+
+/* =========================
+   RENDU
+========================= */
+
+const editButtons = (type, id) =>
+    '<div class="actions-cell">' +
+    '<button class="btn small" data-edit="' + type + '" data-id="' + esc(id) + '">Modifier</button>' +
+    '<button class="btn small danger" data-del="' + type + '" data-id="' + esc(id) + '">Supprimer</button>' +
+    '</div>';
+
+const emptyRow = (cols, msg) =>
+    '<tr><td colspan="' + cols + '" class="empty">' + msg + '</td></tr>';
+
+const badge = (label, color) =>
+    '<span class="badge' + (color ? ' ' + color : '') + '">' + esc(label) + '</span>';
+
+function financeTotals() {
+    let income = 0, expense = 0;
+    state.finances.forEach(f => {
+        const a = Number(f.amount) || 0;
+        if (f.type === 'Revenu') income += a; else expense += a;
+    });
+    return { income: income, expense: expense, balance: income - expense };
+}
+
+function renderDashboard() {
+    const t = financeTotals();
+    $('#statMembers').textContent = state.members.length;
+    $('#statEvents').textContent = state.events.length;
+    $('#statSongs').textContent = state.songs.length;
+
+    const bal = $('#statBalance');
+    bal.textContent = fmtMoney(t.balance);
+    bal.style.color = t.balance < 0 ? 'var(--red)' : '';
+
+    const today = todayISO();
+
+    const upcoming = state.events
+        .filter(e => e.date >= today)
+        .map(e => ({
+            date: e.date, time: e.time, title: e.title, place: e.place,
+            label: e.type || 'Événement', color: EVENT_TYPES[e.type] || ''
+        }))
+        .concat(state.rehearsals.filter(r => r.date >= today).map(r => ({
+            date: r.date, time: r.time, title: 'Répétition', place: r.place,
+            label: 'Répétition', color: 'green'
+        })))
+        .sort(byDateTime)
+        .slice(0, 5);
+
+    $('#dashboardEvents').innerHTML = upcoming.length ? upcoming.map(e =>
+        '<div class="list-item event-row">' +
+        '<div class="event-date"><div><b>' + parseISO(e.date).getDate() + '</b>' +
+        '<span>' + monthShort(e.date) + '</span></div></div>' +
+        '<div class="event-info"><strong>' + esc(e.title) + '</strong>' +
+        '<small>' + esc([e.place, e.time].filter(Boolean).join(' · ') || 'Lieu à définir') + '</small></div>' +
+        badge(e.label, e.color) + '</div>'
+    ).join('') : '<div class="empty">Aucun événement à venir</div>';
+
+    const pending = state.tasks
+        .filter(x => !x.done)
+        .sort((a, b) => (a.due || '9999').localeCompare(b.due || '9999'))
+        .slice(0, 5);
+
+    $('#dashboardTasks').innerHTML = pending.length ? pending.map(x => {
+        const late = x.due && x.due < today;
+        const meta = [
+            x.assignee ? '👤 ' + esc(x.assignee) : '',
+            x.due ? '<span class="' + (late ? 'overdue' : '') + '">📅 ' + fmtDate(x.due) + (late ? ' (en retard)' : '') + '</span>' : ''
+        ].filter(Boolean).join(' · ');
+        return '<div class="list-item"><strong>' + esc(x.title) + '</strong><small>' +
+            (meta || 'Sans échéance') + '</small></div>';
+    }).join('') : '<div class="empty">Tout est fait 🎉</div>';
+}
+
+function renderMembers() {
+    $('#membersList').innerHTML = state.members.length ? state.members.map(m =>
+        '<div class="profile-card">' +
+        '<div class="profile-avatar">' + esc(initials(m.name)) + '</div>' +
+        '<h3>' + esc(m.name) + '</h3>' +
+        '<p>' + esc(m.role || 'Rôle non renseigné') + '</p>' +
+        (m.phone ? '<p>📞 <a href="tel:' + esc(m.phone) + '" style="color:inherit">' + esc(m.phone) + '</a></p>' : '') +
+        (m.email ? '<p>✉️ <a href="mailto:' + esc(m.email) + '" style="color:inherit">' + esc(m.email) + '</a></p>' : '') +
+        '<div class="profile-actions">' +
+        '<button class="btn small" data-edit="member" data-id="' + esc(m.id) + '">Modifier</button>' +
+        '<button class="btn small danger" data-del="member" data-id="' + esc(m.id) + '">Supprimer</button>' +
+        '</div></div>'
+    ).join('') : '<div class="empty" style="grid-column:1/-1">Aucun membre pour le moment. Ajoutez les musiciens du groupe.</div>';
+}
+
+function renderEvents() {
+    const q = $('#eventSearch').value;
+    const today = todayISO();
+    const rows = state.events
+        .filter(e => matches(q, e.title, e.place, e.type, e.date))
+        .sort(byDateTime);
+
+    $('#eventsTable').innerHTML = rows.length ? rows.map(e =>
+        '<tr class="' + (e.date < today ? 'row-past' : '') + '">' +
+        '<td><strong>' + fmtDate(e.date) + '</strong></td>' +
+        '<td>' + esc(e.title) + '</td>' +
+        '<td>' + esc(e.place || '—') + '</td>' +
+        '<td>' + esc(e.time || '—') + '</td>' +
+        '<td>' + badge(e.type || 'Autre', EVENT_TYPES[e.type] || '') + '</td>' +
+        '<td>' + editButtons('event', e.id) + '</td></tr>'
+    ).join('') : emptyRow(6, q ? 'Aucun événement ne correspond à la recherche.' : 'Aucun événement planifié.');
+}
+
+function renderRehearsals() {
+    const q = $('#rehearsalSearch').value;
+    const today = todayISO();
+    const rows = state.rehearsals
+        .filter(r => matches(q, r.place, r.goal, r.date))
+        .sort(byDateTime);
+
+    $('#rehearsalsTable').innerHTML = rows.length ? rows.map(r =>
+        '<tr class="' + (r.date < today ? 'row-past' : '') + '">' +
+        '<td><strong>' + fmtDate(r.date) + '</strong></td>' +
+        '<td>' + esc(r.time || '—') + '</td>' +
+        '<td>' + esc(r.place || '—') + '</td>' +
+        '<td>' + esc(r.goal || '—') + '</td>' +
+        '<td>' + editButtons('rehearsal', r.id) + '</td></tr>'
+    ).join('') : emptyRow(5, q ? 'Aucune répétition ne correspond à la recherche.' : 'Aucune répétition planifiée.');
+}
+
+function renderSongs() {
+    const q = $('#songSearch').value;
+    const rows = state.songs
+        .filter(s => matches(q, s.title, s.artist, s.key, s.status))
+        .sort((a, b) => a.title.localeCompare(b.title, 'fr'));
+
+    $('#songsTable').innerHTML = rows.length ? rows.map(s =>
+        '<tr>' +
+        '<td><strong>' + esc(s.title) + '</strong></td>' +
+        '<td>' + esc(s.artist || '—') + '</td>' +
+        '<td>' + esc(s.key || '—') + '</td>' +
+        '<td>' + esc(s.duration || '—') + '</td>' +
+        '<td>' + badge(s.status || 'À apprendre', SONG_STATUS[s.status] || '') + '</td>' +
+        '<td>' + editButtons('song', s.id) + '</td></tr>'
+    ).join('') : emptyRow(6, q ? 'Aucun morceau ne correspond à la recherche.' : 'Aucun morceau au répertoire.');
+}
+
+function renderSetlists() {
+    $('#setlistsList').innerHTML = state.setlists.length ? state.setlists.map(sl => {
+        const songs = sl.songIds.map(getSong).filter(Boolean);
+        const total = songs.reduce((sum, s) => sum + parseDuration(s.duration), 0);
+        const ev = state.events.find(e => e.id === sl.eventId);
+
+        return '<div class="setlist-card">' +
+            '<h3>' + esc(sl.name) + '</h3>' +
+            '<p>' +
+            (ev ? '★ ' + esc(ev.title) + ' · ' + fmtDate(ev.date) + '<br>' : '') +
+            songs.length + ' morceau' + (songs.length > 1 ? 'x' : '') + ' · ' + fmtTotal(total) +
+            (sl.notes ? '<br>' + esc(sl.notes) : '') +
+            '</p>' +
+            '<div class="song-chips">' + (songs.length ? songs.map((s, i) =>
+                '<span class="song-chip">' + (i + 1) + '. ' + esc(s.title) + '</span>'
+            ).join('') : '<span class="song-chip">Aucun morceau</span>') + '</div>' +
+            '<div class="profile-actions">' +
+            '<button class="btn small" data-edit="setlist" data-id="' + esc(sl.id) + '">Modifier</button>' +
+            '<button class="btn small" data-copy="' + esc(sl.id) + '">Copier</button>' +
+            '<button class="btn small danger" data-del="setlist" data-id="' + esc(sl.id) + '">Supprimer</button>' +
+            '</div></div>';
+    }).join('') : '<div class="empty" style="grid-column:1/-1">Aucune setlist. Créez-en une pour préparer votre prochain concert.</div>';
+}
+
+function renderTasks() {
+    const today = todayISO();
+    const tasks = state.tasks.slice().sort((a, b) =>
+        (a.done - b.done) || (a.due || '9999').localeCompare(b.due || '9999')
+    );
+
+    $('#tasksList').innerHTML = tasks.length ? tasks.map(x => {
+        const late = !x.done && x.due && x.due < today;
+        const meta = [
+            x.assignee ? '👤 ' + esc(x.assignee) : '',
+            x.due ? '<span class="' + (late ? 'overdue' : '') + '">📅 ' + fmtDate(x.due) + (late ? ' (en retard)' : '') + '</span>' : ''
+        ].filter(Boolean).join(' · ');
+
+        return '<div class="list-item task-item' + (x.done ? ' task-done' : '') + '">' +
+            '<input type="checkbox" class="task-check" data-toggle="' + esc(x.id) + '"' +
+            (x.done ? ' checked' : '') + ' aria-label="Terminée">' +
+            '<div class="task-content"><strong>' + esc(x.title) + '</strong>' +
+            '<small>' + (meta || 'Sans échéance') + '</small></div>' +
+            editButtons('task', x.id) + '</div>';
+    }).join('') : '<div class="empty">Aucune tâche. Ajoutez ce que le groupe doit accomplir.</div>';
+}
+
+function renderFinances() {
+    const t = financeTotals();
+    $('#incomeTotal').textContent = fmtMoney(t.income);
+    $('#expenseTotal').textContent = fmtMoney(t.expense);
+
+    const bal = $('#balanceTotal');
+    bal.textContent = fmtMoney(t.balance);
+    bal.style.color = t.balance < 0 ? 'var(--red)' : 'var(--green)';
+
+    const rows = state.finances.slice().sort((a, b) => b.date.localeCompare(a.date));
+
+    $('#financeTable').innerHTML = rows.length ? rows.map(f => {
+        const income = f.type === 'Revenu';
+        return '<tr>' +
+            '<td><strong>' + fmtDate(f.date) + '</strong></td>' +
+            '<td>' + esc(f.desc) + '</td>' +
+            '<td>' + badge(f.type, income ? 'green' : 'red') + '</td>' +
+            '<td><strong style="color:' + (income ? 'var(--green)' : 'var(--red)') + '">' +
+            (income ? '+ ' : '− ') + fmtMoney(f.amount) + '</strong></td>' +
+            '<td>' + editButtons('finance', f.id) + '</td></tr>';
+    }).join('') : emptyRow(5, 'Aucune opération enregistrée.');
+}
+
+function renderGear() {
+    const q = $('#gearSearch').value;
+    const rows = state.gear
+        .filter(g => matches(q, g.name, g.category, g.owner, g.condition))
+        .sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+
+    $('#gearTable').innerHTML = rows.length ? rows.map(g =>
+        '<tr>' +
+        '<td><strong>' + esc(g.name) + '</strong></td>' +
+        '<td>' + esc(g.category || '—') + '</td>' +
+        '<td>' + esc(g.owner || '—') + '</td>' +
+        '<td>' + badge(g.condition || 'Bon', GEAR_CONDITIONS[g.condition] || '') + '</td>' +
+        '<td>' + editButtons('gear', g.id) + '</td></tr>'
+    ).join('') : emptyRow(5, q ? 'Aucun équipement ne correspond à la recherche.' : 'Aucun matériel enregistré.');
+}
+
+function renderContacts() {
+    const q = $('#contactSearch').value;
+    const rows = state.contacts
+        .filter(c => matches(q, c.name, c.role, c.phone, c.email))
+        .sort((a, b) => a.name.localeCompare(b.name, 'fr'));
+
+    $('#contactsTable').innerHTML = rows.length ? rows.map(c =>
+        '<tr>' +
+        '<td><strong>' + esc(c.name) + '</strong></td>' +
+        '<td>' + esc(c.role || '—') + '</td>' +
+        '<td>' + (c.phone ? '<a href="tel:' + esc(c.phone) + '">' + esc(c.phone) + '</a>' : '—') + '</td>' +
+        '<td>' + (c.email ? '<a href="mailto:' + esc(c.email) + '">' + esc(c.email) + '</a>' : '—') + '</td>' +
+        '<td>' + editButtons('contact', c.id) + '</td></tr>'
+    ).join('') : emptyRow(5, q ? 'Aucun contact ne correspond à la recherche.' : 'Aucun contact enregistré.');
+}
+
+function renderSettings() {
+    $('#setName').value  = state.settings.bandName || '';
+    $('#setGenre').value = state.settings.genre || '';
+    $('#setCity').value  = state.settings.city || '';
+    $('#setEmail').value = state.settings.email || '';
+}
+
+function applyBranding() {
+    const name = (state.settings.bandName || '').trim() || 'JDA Rock';
+    const parts = name.split(/\s+/);
+    const first = parts.shift();
+    const rest = parts.join(' ');
+    const html = esc(first) + (rest ? ' <span>' + esc(rest) + '</span>' : '');
+
+    $('#logoTitle').innerHTML = html;
+    $('#heroTitle').innerHTML = html;
+    $('#logoMark').textContent = Array.from(name)[0].toUpperCase();
+    $('#avatarBtn').textContent = initials(name);
+    $('#avatarBtn').title = name;
+    $('#statusText').textContent = name + ' est actif';
+    document.title = name + ' Manager';
+    updateHeader();
+}
+
+function renderAll() {
+    renderDashboard();
+    renderMembers();
+    renderEvents();
+    renderRehearsals();
+    renderSongs();
+    renderSetlists();
+    renderTasks();
+    renderFinances();
+    renderGear();
+    renderContacts();
+}
+
+/* =========================
+   NAVIGATION
+========================= */
+
+const PAGES = {
+    dashboard:  ['Tableau de bord', null],
+    members:    ['Membres', 'Les musiciens du groupe'],
+    events:     ['Agenda', 'Concerts et dates importantes'],
+    rehearsals: ['Répétitions', 'Vos séances de travail'],
+    songs:      ['Morceaux', 'Votre répertoire'],
+    setlists:   ['Setlists', 'La préparation de vos concerts'],
+    tasks:      ['Tâches', 'L’organisation du groupe'],
+    finances:   ['Finances', 'Revenus et dépenses'],
+    gear:       ['Matériel', 'Backline et équipements'],
+    contacts:   ['Contacts', 'Salles, techniciens et partenaires'],
+    settings:   ['Paramètres', 'Configuration et données']
+};
+
+let currentPage = 'dashboard';
+
+function updateHeader() {
+    const p = PAGES[currentPage];
+    $('#pageTitle').textContent = p[0];
+    $('#topSubtitle').textContent = p[1] || ('Gestion de ' + (state.settings.bandName || 'JDA Rock'));
+}
+
+function closeSidebar() {
+    $('#sidebar').classList.remove('open');
+}
+
+function go(page) {
+    if (!PAGES[page]) page = 'dashboard';
+    currentPage = page;
+    $$('.page').forEach(p => p.classList.toggle('active', p.id === page));
+    $$('.nav button').forEach(b => b.classList.toggle('active', b.dataset.page === page));
+    updateHeader();
+    closeSidebar();
+    window.scrollTo(0, 0);
+}
+
+$('#mobileMenu').addEventListener('click', e => {
+    e.stopPropagation();
+    $('#sidebar').classList.toggle('open');
+});
+
+$('.main').addEventListener('click', closeSidebar);
+
+/* =========================
+   OUTILS (export / import / reset)
+========================= */
+
+function exportData() {
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'jda-rock-manager-' + todayISO() + '.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    toast('Sauvegarde exportée');
+}
+
+function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    ta.remove();
+    return ok ? Promise.resolve() : Promise.reject(new Error('copy'));
+}
+
+function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+    }
+    return fallbackCopy(text);
+}
+
+function copySetlist(id) {
+    const sl = state.setlists.find(x => x.id === id);
+    if (!sl) return;
+    const lines = sl.songIds.map(getSong).filter(Boolean).map((s, i) =>
+        (i + 1) + '. ' + s.title + (s.artist ? ' — ' + s.artist : '') + (s.key ? ' (' + s.key + ')' : '')
+    );
+    copyText(sl.name + '\n' + lines.join('\n'))
+        .then(() => toast('Setlist copiée dans le presse-papiers'))
+        .catch(() => toast('Copie impossible sur ce navigateur'));
+}
+
+function runTool(tool) {
+    if (tool === 'export') return exportData();
+    if (tool === 'import') return $('#importFile').click();
+
+    if (tool === 'demo') {
+        return confirmDialog(
+            'Charger les données d’exemple',
+            'Les données actuelles seront <strong>remplacées</strong> par un jeu de démonstration.',
+            'Charger',
+            () => {
+                const keep = state.settings;
+                state = seedState();
+                state.settings = keep;
+                commit();
+                toast('Données d’exemple chargées');
+            }
+        );
+    }
+
+    if (tool === 'reset') {
+        return confirmDialog(
+            'Tout effacer',
+            'Membres, événements, morceaux, setlists, tâches, finances, matériel et contacts seront <strong>supprimés définitivement</strong>. Pensez à exporter une sauvegarde avant.',
+            'Tout effacer',
+            () => {
+                const keep = state.settings;
+                state = emptyState();
+                state.settings = keep;
+                commit();
+                toast('Toutes les données ont été effacées');
+            }
+        );
+    }
+}
+
+$('#importFile').addEventListener('change', e => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = () => {
+        let data;
+        try {
+            data = JSON.parse(reader.result);
+            const valid = data && typeof data === 'object' &&
+                COLLECTIONS.some(k => Array.isArray(data[k]));
+            if (!valid) throw new Error('format');
+        } catch (err) {
+            return toast('Fichier invalide : ce n’est pas une sauvegarde JDA Rock Manager');
+        }
+        confirmDialog(
+            'Importer la sauvegarde',
+            'Les données actuelles seront <strong>remplacées</strong> par celles du fichier « ' + esc(file.name) + ' ».',
+            'Importer',
+            () => {
+                state = normalizeState(data);
+                renderSettings();
+                applyBranding();
+                commit();
+                toast('Sauvegarde importée');
+            }
+        );
+    };
+    reader.onerror = () => toast('Impossible de lire le fichier');
+    reader.readAsText(file);
+});
+
+/* =========================
+   ÉVÉNEMENTS GLOBAUX
+========================= */
+
+document.addEventListener('click', e => {
+    const t = e.target.closest('[data-page],[data-go],[data-action],[data-edit],[data-del],[data-copy],[data-tool]');
+    if (!t) return;
+
+    if (t.dataset.page)        go(t.dataset.page);
+    else if (t.dataset.go)     go(t.dataset.go);
+    else if (t.dataset.action) openForm(t.dataset.action);
+    else if (t.dataset.edit)   openForm(t.dataset.edit, t.dataset.id);
+    else if (t.dataset.del)    askDelete(t.dataset.del, t.dataset.id);
+    else if (t.dataset.copy)   copySetlist(t.dataset.copy);
+    else if (t.dataset.tool)   runTool(t.dataset.tool);
+});
+
+document.addEventListener('change', e => {
+    const cb = e.target.closest ? e.target.closest('[data-toggle]') : null;
+    if (!cb) return;
+    const task = state.tasks.find(x => x.id === cb.dataset.toggle);
+    if (task) {
+        task.done = cb.checked;
+        commit();
+    }
+});
+
+$('#eventSearch').addEventListener('input', renderEvents);
+$('#rehearsalSearch').addEventListener('input', renderRehearsals);
+$('#songSearch').addEventListener('input', renderSongs);
+$('#gearSearch').addEventListener('input', renderGear);
+$('#contactSearch').addEventListener('input', renderContacts);
+
+$('#saveSettings').addEventListener('click', () => {
+    const name = $('#setName').value.trim();
+    if (!name) {
+        $('#setName').focus();
+        return toast('Le nom du groupe est obligatoire');
+    }
+    state.settings = {
+        bandName: name,
+        genre: $('#setGenre').value.trim(),
+        city: $('#setCity').value.trim(),
+        email: $('#setEmail').value.trim()
+    };
+    persist();
+    applyBranding();
+    toast('Informations du groupe enregistrées');
+});
+
+$('#saveButton').addEventListener('click', () => {
+    if (persist()) {
+        toast('Données sauvegardées');
+    } else {
+        toast('Stockage du navigateur indisponible : utilisez Paramètres › Exporter');
+    }
+});
+
+/* =========================
+   DÉMARRAGE
+========================= */
+
+renderSettings();
+applyBranding();
+renderAll();
+persist();
+
+})();
+</script>
+
+</body>
+</html>
